@@ -2,9 +2,9 @@ package mongorepo
 
 import (
 	"context"
+	"time"
 
 	"github.com/bastianrob/go-restify/scenario"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -53,16 +53,11 @@ func (repo *scenarioRepo) Find(ctx context.Context, dbname, name string) ([]rest
 }
 
 func (repo *scenarioRepo) Get(ctx context.Context, dbname, id string) (restify.Scenario, error) {
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, exception.New(400, "Failed, ID is not a valid hex")
-	}
-
-	filter := bson.M{"_id": oid}
+	filter := bson.M{"_id": id}
 	res := repo.client.Database(dbname).Collection("scenario").FindOne(ctx, filter)
 
 	scenario := scenario.New()
-	err = res.Decode(scenario)
+	err := res.Decode(scenario)
 	if err != nil {
 		return nil, exception.New(500, "Failed to decode scenario from database")
 	}
@@ -71,6 +66,9 @@ func (repo *scenarioRepo) Get(ctx context.Context, dbname, id string) (restify.S
 }
 
 func (repo *scenarioRepo) Add(ctx context.Context, dbname string, scenario restify.Scenario) (restify.Scenario, error) {
+	id := primitive.NewObjectIDFromTimestamp(time.Now()).Hex()
+	scenario.Set().ID(id)
+
 	_, err := repo.client.
 		Database(dbname).
 		Collection("scenario").
@@ -83,14 +81,9 @@ func (repo *scenarioRepo) Add(ctx context.Context, dbname string, scenario resti
 }
 
 func (repo *scenarioRepo) Update(ctx context.Context, dbname, id string, scenario restify.Scenario) (restify.Scenario, error) {
-	oid, err := primitive.ObjectIDFromHex(scenario.Get().ID())
-	if err != nil {
-		return nil, exception.New(400, "ID is not a valid hex")
-	}
-
-	filter := bson.M{"_id": oid}
+	filter := bson.M{"_id": id}
 	update := bson.M{"$set": scenario}
-	_, err = repo.client.
+	_, err := repo.client.
 		Database(dbname).
 		Collection("scenario").
 		UpdateOne(ctx, filter, update)
@@ -102,12 +95,7 @@ func (repo *scenarioRepo) Update(ctx context.Context, dbname, id string, scenari
 }
 
 func (repo *scenarioRepo) Delete(ctx context.Context, dbname, id string) error {
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return exception.New(400, "ID is not a valid hex")
-	}
-
-	filter := bson.M{"_id": oid}
+	filter := bson.M{"_id": id}
 	res, err := repo.client.
 		Database(dbname).
 		Collection("scenario").

@@ -34,6 +34,7 @@ func (hndl *scenarioHandler) Find() middleware.HTTPMiddleware {
 
 				w.WriteHeader(http.StatusInternalServerError)
 				h.ServeHTTP(w, r)
+				return
 			}
 
 			resp := controller.Response{Data: scenarios}
@@ -59,6 +60,7 @@ func (hndl *scenarioHandler) Get() middleware.HTTPMiddleware {
 
 				w.WriteHeader(http.StatusInternalServerError)
 				h.ServeHTTP(w, r)
+				return
 			}
 
 			resp := controller.Response{Data: scenario}
@@ -81,6 +83,7 @@ func (hndl *scenarioHandler) Add() middleware.HTTPMiddleware {
 
 				w.WriteHeader(http.StatusBadRequest)
 				h.ServeHTTP(w, r)
+				return
 			}
 
 			scenario := scenario.New()
@@ -92,6 +95,7 @@ func (hndl *scenarioHandler) Add() middleware.HTTPMiddleware {
 
 				w.WriteHeader(http.StatusInternalServerError)
 				h.ServeHTTP(w, r)
+				return
 			}
 
 			resp := controller.Response{Data: scenario}
@@ -117,6 +121,7 @@ func (hndl *scenarioHandler) Update() middleware.HTTPMiddleware {
 
 				w.WriteHeader(http.StatusBadRequest)
 				h.ServeHTTP(w, r)
+				return
 			}
 
 			scenario := scenario.New()
@@ -128,6 +133,7 @@ func (hndl *scenarioHandler) Update() middleware.HTTPMiddleware {
 
 				w.WriteHeader(http.StatusInternalServerError)
 				h.ServeHTTP(w, r)
+				return
 			}
 
 			resp := controller.Response{Data: scenario}
@@ -153,6 +159,7 @@ func (hndl *scenarioHandler) Delete() middleware.HTTPMiddleware {
 
 				w.WriteHeader(http.StatusInternalServerError)
 				h.ServeHTTP(w, r)
+				return
 			}
 
 			w.WriteHeader(http.StatusNoContent)

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	handlerV1 "github.com/bastianrob/restsuite/pkg/controller/v1"
 	serviceV1 "github.com/bastianrob/restsuite/pkg/service/v1"
@@ -23,6 +25,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = mongoClient.Connect(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	scenarioRepo := mongorepo.NewScenarioRepo(mongoClient)
 	scenarioService := serviceV1.NewScenarioService(scenarioRepo)
 	scenarioHandler := handlerV1.NewScenarioHandler(scenarioService)
@@ -34,5 +42,4 @@ func main() {
 	httphandler := handlers.CombinedLoggingHandler(os.Stdout, routes)
 	httphandler = handlers.RecoveryHandler()(httphandler)
 	log.Fatal(http.ListenAndServe(":3000", httphandler))
-
 }

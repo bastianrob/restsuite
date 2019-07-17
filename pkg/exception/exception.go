@@ -20,6 +20,8 @@ func (e *exception) Error() string {
 
 //New exception
 func New(code int, message string, params ...interface{}) error {
-	message = fmt.Sprintf(message, params)
+	if params != nil && len(params) > 0 {
+		message = fmt.Sprintf(message, params)
+	}
 	return &exception{code, message}
 }

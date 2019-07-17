@@ -2,10 +2,8 @@ package v1
 
 import (
 	"context"
-	"time"
 
 	thennable "github.com/bastianrob/go-thennable"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	restify "github.com/bastianrob/go-restify"
 	"github.com/bastianrob/restsuite/pkg/repo"
@@ -24,10 +22,10 @@ func NewScenarioService(repo repo.ScenarioRepo) service.ScenarioService {
 func (svc *scenarioService) Find(ctx context.Context, name string) ([]restify.Scenario, error) {
 	res, err := thennable.Start(ctx).
 		Then(service.GetOrganizationName).
-		Then(func(dbname string) (context.Context, string, string, error) {
+		Then(func(ctx context.Context, dbname string) (context.Context, string, string, error) {
 			return ctx, dbname, name, nil
 		}).
-		Then(svc.repo.Get).
+		Then(svc.repo.Find).
 		End()
 
 	if err != nil {
@@ -38,11 +36,13 @@ func (svc *scenarioService) Find(ctx context.Context, name string) ([]restify.Sc
 }
 
 func (svc *scenarioService) Get(ctx context.Context, id string) (restify.Scenario, error) {
+	provideData := func(ctx context.Context, dbname string) (context.Context, string, string, error) {
+		return ctx, dbname, id, nil
+	}
+
 	res, err := thennable.Start(ctx).
 		Then(service.GetOrganizationName).
-		Then(func(dbname string) (context.Context, string, string, error) {
-			return ctx, dbname, id, nil
-		}).
+		Then(provideData).
 		Then(svc.repo.Get).
 		End()
 
@@ -56,12 +56,6 @@ func (svc *scenarioService) Get(ctx context.Context, id string) (restify.Scenari
 func (svc *scenarioService) Add(ctx context.Context, scenario restify.Scenario) (restify.Scenario, error) {
 	_, err := thennable.Start(ctx).
 		Then(service.GetOrganizationName).
-		Then(func(ctx context.Context, dbname string) (context.Context, string, restify.Scenario, error) {
-			id := primitive.NewObjectIDFromTimestamp(time.Now()).Hex()
-			scenario.Set().ID(id)
-
-			return ctx, dbname, scenario, nil
-		}).
 		Then(svc.repo.Add).
 		End()
 
@@ -69,11 +63,13 @@ func (svc *scenarioService) Add(ctx context.Context, scenario restify.Scenario) 
 }
 
 func (svc *scenarioService) Update(ctx context.Context, id string, scenario restify.Scenario) (restify.Scenario, error) {
+	provideUpdateData := func(ctx context.Context, dbname string) (context.Context, string, string, restify.Scenario, error) {
+		return ctx, dbname, id, scenario, nil
+	}
+
 	_, err := thennable.Start(ctx).
 		Then(service.GetOrganizationName).
-		Then(func(ctx context.Context, dbname string) (context.Context, string, string, restify.Scenario, error) {
-			return ctx, dbname, id, scenario, nil
-		}).
+		Then(provideUpdateData).
 		Then(svc.repo.Update).
 		End()
 
@@ -81,11 +77,13 @@ func (svc *scenarioService) Update(ctx context.Context, id string, scenario rest
 }
 
 func (svc *scenarioService) Delete(ctx context.Context, id string) error {
+	provideData := func(ctx context.Context, dbname string) (context.Context, string, string, error) {
+		return ctx, dbname, id, nil
+	}
+
 	_, err := thennable.Start(ctx).
 		Then(service.GetOrganizationName).
-		Then(func(dbname string) (context.Context, string, string, error) {
-			return ctx, dbname, id, nil
-		}).
+		Then(provideData).
 		Then(svc.repo.Delete).
 		End()
 
