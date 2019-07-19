@@ -9,11 +9,15 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func pipe(function middleware.HTTPMiddleware) http.HandlerFunc {
-	return middleware.NewPipeline().
-		Do(oauth.Authenticate()).
-		Do(function).
-		For(func(w http.ResponseWriter, r *http.Request) {})
+func final(w http.ResponseWriter, r *http.Request) {}
+
+func pipe(endpoint func() middleware.HTTPMiddleware) http.HandlerFunc {
+	return middleware.
+		NewPipeline().              //HTTP pipeline
+		Do(oauth.Authenticate()).   //Authenticate user
+		Do(controller.UnwrapJWT()). //Unwrap JWT token to get oranization name
+		Do(endpoint()).             //Call the endpoint
+		For(final)                  //Final call, do nothing? track metric?
 }
 
 func healthcheck(router *httprouter.Router) {
@@ -23,8 +27,8 @@ func healthcheck(router *httprouter.Router) {
 }
 
 func routesV1(router *httprouter.Router, controller controller.ScenarioController) {
-	router.HandlerFunc("GET", "/v1/scenarios", pipe(controller.Find()))
-	router.HandlerFunc("POST", "/v1/scenarios", pipe(controller.Add()))
-	router.HandlerFunc("GET", "/v1/scenarios/:id", pipe(controller.Get()))
-	router.HandlerFunc("PATCH", "/v1/scenarios/:id", pipe(controller.Update()))
+	router.HandlerFunc("GET", "/v1/scenarios", pipe(controller.Find))
+	router.HandlerFunc("POST", "/v1/scenarios", pipe(controller.Add))
+	router.HandlerFunc("GET", "/v1/scenarios/:id", pipe(controller.Get))
+	router.HandlerFunc("PATCH", "/v1/scenarios/:id", pipe(controller.Update))
 }
