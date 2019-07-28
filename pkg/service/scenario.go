@@ -22,7 +22,7 @@ type ScenarioService interface {
 func GetOrganizationName(ctx context.Context) (context.Context, string, error) {
 	dbname, ok := ctx.Value(ctxkey.OrganizationName).(string)
 	if !ok || dbname == "" {
-		return ctx, "", exception.New(400, "Organization name is not found in request context")
+		return ctx, "", exception.New(403, "Organization name is not found in request context")
 	}
 
 	return ctx, dbname, nil

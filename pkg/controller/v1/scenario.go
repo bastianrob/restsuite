@@ -40,8 +40,8 @@ func (hndl *scenarioHandler) Find() middleware.HTTPMiddleware {
 			resp := controller.Response{Data: scenarios}
 			body, _ := json.Marshal(resp)
 
-			w.Write(body)
 			w.WriteHeader(http.StatusOK)
+			w.Write(body)
 			h.ServeHTTP(w, r)
 		}
 	}
@@ -66,8 +66,8 @@ func (hndl *scenarioHandler) Get() middleware.HTTPMiddleware {
 			resp := controller.Response{Data: scenario}
 			body, _ := json.Marshal(resp)
 
-			w.Write(body)
 			w.WriteHeader(http.StatusOK)
+			w.Write(body)
 			h.ServeHTTP(w, r)
 		}
 	}
@@ -101,8 +101,8 @@ func (hndl *scenarioHandler) Add() middleware.HTTPMiddleware {
 			resp := controller.Response{Data: scenario}
 			body, _ := json.Marshal(resp)
 
-			w.Write(body)
 			w.WriteHeader(http.StatusCreated)
+			w.Write(body)
 			h.ServeHTTP(w, r)
 		}
 	}
@@ -139,8 +139,8 @@ func (hndl *scenarioHandler) Update() middleware.HTTPMiddleware {
 			resp := controller.Response{Data: scenario}
 			body, _ := json.Marshal(resp)
 
-			w.Write(body)
 			w.WriteHeader(http.StatusCreated)
+			w.Write(body)
 			h.ServeHTTP(w, r)
 		}
 	}

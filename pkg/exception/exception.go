@@ -5,17 +5,25 @@ import "fmt"
 //Exception interface
 type Exception interface {
 	Code() int
-	String() string
+	Message() string
 }
 
 //exception data model
 type exception struct {
-	Code    int
-	Message string
+	code    int
+	message string
 }
 
 func (e *exception) Error() string {
-	return fmt.Sprintf("Code: %d, Message: %s", e.Code, e.Message)
+	return fmt.Sprintf("Code: %d, Message: %s", e.code, e.message)
+}
+
+func (e *exception) Code() int {
+	return e.code
+}
+
+func (e *exception) Message() string {
+	return e.message
 }
 
 //New exception
@@ -24,4 +32,10 @@ func New(code int, message string, params ...interface{}) error {
 		message = fmt.Sprintf(message, params)
 	}
 	return &exception{code, message}
+}
+
+//IsException is error of type exception
+func IsException(err error) (Exception, bool) {
+	exc, ok := err.(*exception)
+	return exc, ok
 }

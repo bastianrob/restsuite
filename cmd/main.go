@@ -11,6 +11,7 @@ import (
 	serviceV1 "github.com/bastianrob/restsuite/pkg/service/v1"
 	"github.com/gorilla/handlers"
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,11 +36,33 @@ func main() {
 	scenarioService := serviceV1.NewScenarioService(scenarioRepo)
 	scenarioHandler := handlerV1.NewScenarioHandler(scenarioService)
 
+	orgRepo := mongorepo.NewOrganizationRepo(mongoClient)
+	orgService := serviceV1.NewOrganizationService(orgRepo)
+	orgHandler := handlerV1.NewOrganizationHandler(orgService)
+
 	routes := httprouter.New()
 	healthcheck(routes)
-	routesV1(routes, scenarioHandler)
+	scenarioV1(routes, scenarioHandler)
+	orgV1(routes, orgHandler)
 
 	httphandler := handlers.CombinedLoggingHandler(os.Stdout, routes)
 	httphandler = handlers.RecoveryHandler()(httphandler)
-	log.Fatal(http.ListenAndServe(":3000", httphandler))
+	httphandler = cors.New(cors.Options{
+		AllowedOrigins: []string{
+			"http://localhost:*",
+		},
+		AllowCredentials: true,
+		AllowedMethods: []string{
+			http.MethodHead,
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodPatch,
+			http.MethodDelete,
+			http.MethodOptions,
+		},
+		AllowedHeaders: []string{"*"},
+	}).Handler(httphandler)
+	log.Println("Serving :7001")
+	log.Fatal(http.ListenAndServe(":7001", httphandler))
 }

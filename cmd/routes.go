@@ -26,9 +26,15 @@ func healthcheck(router *httprouter.Router) {
 	})
 }
 
-func routesV1(router *httprouter.Router, controller controller.ScenarioController) {
+func scenarioV1(router *httprouter.Router, controller controller.ScenarioController) {
 	router.HandlerFunc("GET", "/v1/scenarios", pipe(controller.Find))
 	router.HandlerFunc("POST", "/v1/scenarios", pipe(controller.Add))
 	router.HandlerFunc("GET", "/v1/scenarios/:id", pipe(controller.Get))
 	router.HandlerFunc("PATCH", "/v1/scenarios/:id", pipe(controller.Update))
+}
+
+func orgV1(router *httprouter.Router, controller controller.OrganizationController) {
+	router.HandlerFunc("GET", "/v1/org", pipe(controller.Get))
+	router.HandlerFunc("POST", "/v1/org", pipe(controller.Add))
+	router.HandlerFunc("PATCH", "/v1/org", pipe(controller.Update))
 }

@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"github.com/bastianrob/restsuite/pkg/ctxkey"
@@ -24,21 +23,14 @@ func UnwrapJWT() middleware.HTTPMiddleware {
 				return
 			}
 
-			customClaims := map[string]interface{}{}
-			err := json.Unmarshal(authClaims.CustomClaims, &customClaims)
-			if err != nil {
-				h.ServeHTTP(w, r)
-				return
-			}
-
-			organizationName, ok := customClaims["org"]
+			organizationName, ok := authClaims.CustomClaims["org"]
 			if !ok {
 				h.ServeHTTP(w, r)
 				return
 			}
 
 			ctx = context.WithValue(ctx, ctxkey.OrganizationName, organizationName)
-			r.WithContext(ctx)
+			r = r.WithContext(ctx)
 			h.ServeHTTP(w, r)
 		}
 	}
