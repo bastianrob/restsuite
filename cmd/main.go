@@ -60,6 +60,7 @@ func main() {
 			http.MethodPatch,
 			http.MethodDelete,
 			http.MethodOptions,
+			"RUN", //custom method
 		},
 		AllowedHeaders: []string{"*"},
 	}).Handler(httphandler)

@@ -31,6 +31,7 @@ func scenarioV1(router *httprouter.Router, controller controller.ScenarioControl
 	router.HandlerFunc("POST", "/v1/scenarios", pipe(controller.Add))
 	router.HandlerFunc("GET", "/v1/scenarios/:id", pipe(controller.Get))
 	router.HandlerFunc("PATCH", "/v1/scenarios/:id", pipe(controller.Update))
+	router.HandlerFunc("RUN", "/v1/scenarios/:id", pipe(controller.Run))
 }
 
 func orgV1(router *httprouter.Router, controller controller.OrganizationController) {

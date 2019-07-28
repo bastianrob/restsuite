@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 
@@ -64,6 +65,33 @@ func (hndl *scenarioHandler) Get() middleware.HTTPMiddleware {
 			}
 
 			resp := controller.Response{Data: scenario}
+			body, _ := json.Marshal(resp)
+
+			w.WriteHeader(http.StatusOK)
+			w.Write(body)
+			h.ServeHTTP(w, r)
+		}
+	}
+}
+
+func (hndl *scenarioHandler) Run() middleware.HTTPMiddleware {
+	return func(h http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			ps := httprouter.ParamsFromContext(ctx)
+			id := ps.ByName("id")
+
+			output, err := hndl.svc.Run(ctx, id)
+			if err != nil {
+				log.Println("ERR Failed to run test scenario with ID:", id, err.Error())
+
+				w.WriteHeader(http.StatusInternalServerError)
+				h.ServeHTTP(w, r)
+				return
+			}
+
+			result := strings.Split(output, "\n")
+			resp := controller.Response{Data: result}
 			body, _ := json.Marshal(resp)
 
 			w.WriteHeader(http.StatusOK)

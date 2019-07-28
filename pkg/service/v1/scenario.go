@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"bytes"
 	"context"
 
 	thennable "github.com/bastianrob/go-thennable"
@@ -51,6 +52,19 @@ func (svc *scenarioService) Get(ctx context.Context, id string) (restify.Scenari
 	}
 
 	return res[0].(restify.Scenario), nil
+}
+
+func (svc *scenarioService) Run(ctx context.Context, id string) (string, error) {
+	buffer := bytes.Buffer{}
+	_, err := thennable.Start(ctx, id).
+		Then(svc.Get).
+		Then(func(scenario restify.Scenario) error {
+			scenario.Run(&buffer)
+			return nil
+		}).
+		End()
+
+	return buffer.String(), err
 }
 
 func (svc *scenarioService) Add(ctx context.Context, scenario restify.Scenario) (restify.Scenario, error) {

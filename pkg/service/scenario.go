@@ -12,6 +12,7 @@ import (
 type ScenarioService interface {
 	Find(ctx context.Context, name string) ([]restify.Scenario, error)
 	Get(ctx context.Context, id string) (restify.Scenario, error)
+	Run(ctx context.Context, id string) (string, error)
 
 	Add(ctx context.Context, scenario restify.Scenario) (restify.Scenario, error)
 	Update(ctx context.Context, id string, scenario restify.Scenario) (restify.Scenario, error)

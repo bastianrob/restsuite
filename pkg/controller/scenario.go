@@ -6,6 +6,7 @@ import "github.com/bastianrob/go-httputil/middleware"
 type ScenarioController interface {
 	Find() middleware.HTTPMiddleware
 	Get() middleware.HTTPMiddleware
+	Run() middleware.HTTPMiddleware
 
 	Add() middleware.HTTPMiddleware
 	Update() middleware.HTTPMiddleware
