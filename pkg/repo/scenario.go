@@ -14,4 +14,6 @@ type ScenarioRepo interface {
 	Add(ctx context.Context, dbname string, scenario restify.Scenario) (restify.Scenario, error)
 	Update(ctx context.Context, dbname, id string, scenario restify.Scenario) (restify.Scenario, error)
 	Delete(ctx context.Context, dbname, id string) error
+
+	AddResult(ctx context.Context, dbname string, testResults []restify.TestResult) error
 }

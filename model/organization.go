@@ -27,7 +27,7 @@ type Subscription struct {
 type Organization struct {
 	ID           string        `json:"-" bson:"_id"`
 	Name         string        `json:"name" bson:"name"`
-	Alias        string        `json:"-" bson:"alias"`
+	Alias        string        `json:"alias" bson:"alias"`
 	Endpoints    []Endpoint    `json:"endpoints" bson:"endpoints"`
 	Environments []Environment `json:"environments" bson:"environments"`
 	Subscription Subscription  `json:"-" bson:"subscription"`

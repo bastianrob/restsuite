@@ -56,13 +56,18 @@ func (svc *scenarioService) Get(ctx context.Context, id string) (restify.Scenari
 
 func (svc *scenarioService) Run(ctx context.Context, id string) (string, error) {
 	buffer := bytes.Buffer{}
-	_, err := thennable.Start(ctx, id).
+	res, err := thennable.Start(ctx, id).
 		Then(svc.Get).
-		Then(func(scenario restify.Scenario) error {
-			scenario.Run(&buffer)
-			return nil
+		Then(func(scenario restify.Scenario) ([]restify.TestResult, error) {
+			return scenario.Run(&buffer), nil
 		}).
 		End()
+
+	if len(res) > 0 {
+		ts := res[0].([]restify.TestResult)
+		ctx, dbname, _ := service.GetOrganizationName(ctx)
+		svc.repo.AddResult(ctx, dbname, ts)
+	}
 
 	return buffer.String(), err
 }

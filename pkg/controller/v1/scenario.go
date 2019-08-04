@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/bastianrob/go-httputil/middleware"
 	"github.com/bastianrob/go-restify/scenario"
 	"github.com/bastianrob/restsuite/pkg/controller"
+	"github.com/bastianrob/restsuite/pkg/exception"
 	"github.com/bastianrob/restsuite/pkg/service"
 )
 
@@ -29,16 +31,24 @@ func (hndl *scenarioHandler) Find() middleware.HTTPMiddleware {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			name := r.FormValue("name")
+			resp := controller.Response{}
 			scenarios, err := hndl.svc.Find(ctx, name)
 			if err != nil {
-				log.Println("ERR Failed to find test scenario.", err.Error())
+				status, message := http.StatusInternalServerError, fmt.Sprintf("ERR Failed to find test scenario. %s", err.Error())
+				exc, ok := exception.IsException(err)
+				if ok {
+					status, message = exc.Code(), exc.Message()
+				}
 
-				w.WriteHeader(http.StatusInternalServerError)
+				resp.Message = message
+				body, _ := json.Marshal(resp)
+				w.WriteHeader(status)
+				w.Write(body)
 				h.ServeHTTP(w, r)
 				return
 			}
 
-			resp := controller.Response{Data: scenarios}
+			resp.Data = scenarios
 			body, _ := json.Marshal(resp)
 
 			w.WriteHeader(http.StatusOK)
@@ -52,19 +62,27 @@ func (hndl *scenarioHandler) Get() middleware.HTTPMiddleware {
 	return func(h http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
-			ps := httprouter.ParamsFromContext(ctx)
-			id := ps.ByName("id")
+			id := httprouter.ParamsFromContext(ctx).ByName("id")
+			resp := controller.Response{}
 
 			scenario, err := hndl.svc.Get(ctx, id)
 			if err != nil {
-				log.Println("ERR Failed to get test scenario with ID:", id, ".", err.Error())
+				status, message := http.StatusInternalServerError, fmt.Sprintf("ERR Failed to get test scenario with ID: %s. %s", id, err.Error())
+				exc, ok := exception.IsException(err)
+				if ok {
+					status, message = exc.Code(), exc.Message()
+				}
 
-				w.WriteHeader(http.StatusInternalServerError)
+				resp.Message = message
+				body, _ := json.Marshal(resp)
+
+				w.WriteHeader(status)
+				w.Write(body)
 				h.ServeHTTP(w, r)
 				return
 			}
 
-			resp := controller.Response{Data: scenario}
+			resp.Data = scenario
 			body, _ := json.Marshal(resp)
 
 			w.WriteHeader(http.StatusOK)
@@ -90,7 +108,7 @@ func (hndl *scenarioHandler) Run() middleware.HTTPMiddleware {
 				return
 			}
 
-			result := strings.Split(output, "\n")
+			result := strings.Split(output, "\r\n")
 			resp := controller.Response{Data: result}
 			body, _ := json.Marshal(resp)
 

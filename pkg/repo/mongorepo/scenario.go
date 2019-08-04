@@ -111,3 +111,17 @@ func (repo *scenarioRepo) Delete(ctx context.Context, dbname, id string) error {
 
 	return nil
 }
+
+func (repo *scenarioRepo) AddResult(ctx context.Context, dbname string, testResults []restify.TestResult) error {
+	docs := make([]interface{}, len(testResults))
+	for i, entry := range testResults {
+		docs[i] = entry
+	}
+
+	_, err := repo.client.Database(dbname).Collection("results").InsertMany(ctx, docs)
+	if err != nil {
+		return exception.New(500, "Failed to insert test result. %s", err.Error())
+	}
+
+	return nil
+}
