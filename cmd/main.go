@@ -50,6 +50,10 @@ func main() {
 	httphandler = cors.New(cors.Options{
 		AllowedOrigins: []string{
 			"http://localhost:*",
+			"http://lapelio.com",
+			"https://lapelio.com",
+			"http://*.lapelio.com",
+			"https://*.lapelio.com",
 		},
 		AllowCredentials: true,
 		AllowedMethods: []string{
