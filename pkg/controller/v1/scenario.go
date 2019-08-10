@@ -108,7 +108,7 @@ func (hndl *scenarioHandler) Run() middleware.HTTPMiddleware {
 				return
 			}
 
-			result := strings.Split(output, "\r\n")
+			result := strings.Split(output, "\n")
 			resp := controller.Response{Data: result}
 			body, _ := json.Marshal(resp)
 

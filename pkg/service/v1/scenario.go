@@ -73,8 +73,13 @@ func (svc *scenarioService) Run(ctx context.Context, id string) (string, error) 
 }
 
 func (svc *scenarioService) Add(ctx context.Context, scenario restify.Scenario) (restify.Scenario, error) {
+	provideData := func(ctx context.Context, dbname string) (context.Context, string, restify.Scenario, error) {
+		return ctx, dbname, scenario, nil
+	}
+
 	_, err := thennable.Start(ctx).
 		Then(service.GetOrganizationName).
+		Then(provideData).
 		Then(svc.repo.Add).
 		End()
 
