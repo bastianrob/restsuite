@@ -28,6 +28,7 @@ type Organization struct {
 	ID           string        `json:"-" bson:"_id"`
 	Name         string        `json:"name" bson:"name"`
 	Alias        string        `json:"alias" bson:"alias"`
+	Users        []string      `json:"users" bson:"users"`
 	Endpoints    []Endpoint    `json:"endpoints" bson:"endpoints"`
 	Environments []Environment `json:"environments" bson:"environments"`
 	Subscription Subscription  `json:"-" bson:"subscription"`

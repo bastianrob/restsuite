@@ -2,9 +2,9 @@ module github.com/bastianrob/restsuite
 
 require (
 	github.com/bastianrob/arrayutil v0.1.0
-	github.com/bastianrob/go-httputil v0.0.1
-	github.com/bastianrob/go-oauth v0.1.0
-	github.com/bastianrob/go-restify v0.1.0
+	github.com/bastianrob/go-httputil v0.0.2
+	github.com/bastianrob/go-oauth v0.1.1
+	github.com/bastianrob/go-restify v0.1.1
 	github.com/bastianrob/go-thennable v1.0.0
 	github.com/bastianrob/go-valuator v0.2.0
 	github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23 // indirect

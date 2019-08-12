@@ -39,3 +39,7 @@ func orgV1(router *httprouter.Router, controller controller.OrganizationControll
 	router.HandlerFunc("POST", "/v1/org", pipe(controller.Add))
 	router.HandlerFunc("PATCH", "/v1/org", pipe(controller.Update))
 }
+
+func resultV1(router *httprouter.Router, controller controller.ResultController) {
+	router.HandlerFunc("GET", "/v1/results", pipe(controller.Find))
+}

@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	oauth "github.com/bastianrob/go-oauth/handler"
 	thennable "github.com/bastianrob/go-thennable"
 	"github.com/bastianrob/restsuite/model"
 	"github.com/bastianrob/restsuite/pkg/repo"
@@ -42,6 +43,9 @@ func (svc *orgService) Add(ctx context.Context, name string) (model.Organization
 	name = reg.ReplaceAllString(name, "")
 	org.Alias = name
 
+	email, _ := ctx.Value(oauth.ContextKeyEmail).(string)
+	org.Users = []string{email}
+
 	//Set subscription as free tier
 	org.Subscription.Type = "Free"
 	org.Subscription.Limit.Endpoint = 10
@@ -57,6 +61,7 @@ func (svc *orgService) Update(ctx context.Context, update model.Organization) (m
 		Then(service.GetOrganizationName).
 		Then(svc.repo.Get).
 		Then(func(existing model.Organization) (context.Context, model.Organization, error) {
+			existing.Users = update.Users
 			existing.Endpoints = update.Endpoints
 			existing.Environments = update.Environments
 

@@ -40,10 +40,15 @@ func main() {
 	orgService := serviceV1.NewOrganizationService(orgRepo)
 	orgHandler := handlerV1.NewOrganizationHandler(orgService)
 
+	resRepo := mongorepo.NewResultRepo(mongoClient)
+	resService := serviceV1.NewResultService(resRepo)
+	resHandler := handlerV1.NewResultHandler(resService)
+
 	routes := httprouter.New()
 	healthcheck(routes)
 	scenarioV1(routes, scenarioHandler)
 	orgV1(routes, orgHandler)
+	resultV1(routes, resHandler)
 
 	httphandler := handlers.CombinedLoggingHandler(os.Stdout, routes)
 	httphandler = handlers.RecoveryHandler()(httphandler)
